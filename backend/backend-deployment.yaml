@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    component: backend
+  name: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      component: backend
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        component: backend
+    spec:
+      containers:
+        - env:
+            - name: DB_HOST
+              value: ${MINIKUBE_IP}
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_USER
+              value: trinitt_users
+            - name: POSTGRES_PORT
+              value: "32000"
+            - name: PGDATA
+              value: "/data/postgres"
+            - name: SERVER_PORT
+              value: "8000"
+            - name: JWT_SECRET
+              value: secret
+            - name: KAFKA_URL
+              value: ${MINIKUBE_IP}:30001
+          image: trinitt_backend
+          imagePullPolicy: Never
+          name: backend
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8000
+      serviceAccountName: ""
+status: {}

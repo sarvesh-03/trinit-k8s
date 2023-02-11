@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    component: connect
+  name: connect
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: connect
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        component: connect
+    spec:
+      containers:
+        - env:
+            - name: CONNECT_REST_ADVERTISED_HOST_NAME
+              value: "connect-service"
+            - name: CONNECT_BOOTSTRAP_SERVERS
+              value: "${MINIKUBE_IP}:30001"
+            - name: CONNECT_REST_PORT
+              value: "8083"
+            - name: CONNECT_GROUP_ID
+              value: "connect-cluster"
+            - name: CONNECT_REPLICATION_FACTOR
+              value: "1"
+            - name: CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR
+              value: "1"
+            - name: CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR
+              value: "1"
+            - name: CONNECT_STATUS_STORAGE_REPLICATION_FACTOR
+              value: "1"
+            - name: CONNECT_CONFIG_STORAGE_TOPIC
+              value: "connect-configs"
+            - name: CONNECT_OFFSET_STORAGE_TOPIC
+              value: "connect-offsets"
+            - name: CONNECT_STATUS_STORAGE_TOPIC
+              value: "connect-status"
+            - name: CONNECT_KEY_CONVERTER
+              value: "org.apache.kafka.connect.json.JsonConverter"
+            - name: CONNECT_VALUE_CONVERTER
+              value: "org.apache.kafka.connect.json.JsonConverter"
+            - name: CONNECT_ZOOKEEPER_CONNECT
+              value: "${MINIKUBE_IP}:30101"
+          image: confluentinc/cp-kafka-connect:latest
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "500m"
+          name: connect
+          ports:
+            - containerPort: 8083
+      serviceAccountName: ""
+status: {}

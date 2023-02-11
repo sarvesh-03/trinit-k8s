@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    component: kafka
+  name: kafka1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: kafka
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        component: kafka
+    spec:
+      containers:
+        - env:
+            - name: KAFKA_ADVERTISED_HOST_NAME
+              value: "${MINIKUBE_IP}"
+            - name: KAFKA_ADVERTISED_LISTENERS
+              value: PLAINTEXT://${MINIKUBE_IP}:30000,PLAINTEXT_HOST://${MINIKUBE_IP}:30001
+            - name: KAFKA_BROKER_ID
+              value: "1"
+            - name: KAFKA_INTER_BROKER_LISTENER_NAME
+              value: PLAINTEXT
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+              value: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_ZOOKEEPER_CONNECT
+              value: "${MINIKUBE_IP}:30101"
+          image: confluentinc/cp-kafka:latest
+          name: kafka1
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          ports:
+            - containerPort: 30000
+            - containerPort: 30001
+      serviceAccountName: ""
+status: {}

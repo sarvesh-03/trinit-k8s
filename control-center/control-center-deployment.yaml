@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    component: control-center
+  name: control-center
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: control-center
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        component: control-center
+    spec:
+      containers:
+        - env:
+            - name: CONFLUENT_METRICS_TOPIC_REPLICATION
+              value: "1"
+            - name: CONTROL_CENTER_BOOTSTRAP_SERVERS
+              value: "${MINIKUBE_IP}:30001"
+            - name: CONTROL_CENTER_CONNECT_CONNECT-DEFAULT_CLUSTER
+              value: ${MINIKUBE_IP}:30205
+            # - name: CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS
+            #   value: "1"
+            # - name: CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS
+            #   value: "1"
+            - name: CONTROL_CENTER_REPLICATION_FACTOR
+              value: "1"
+            - name: PORT
+              value: "9021"
+          image: confluentinc/cp-enterprise-control-center
+          name: control-center
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          ports:
+            - containerPort: 9021
+            - containerPort: 8083
+      hostname: control-center
+      restartPolicy: Always
+      serviceAccountName: ""
+status: {}

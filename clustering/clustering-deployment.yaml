@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    component: clustering
+  name: clustering
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      component: clustering
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        component: clustering
+    spec:
+      containers:
+        - env:
+            - name: SERVER_PORT
+              value: "8000"
+            - name: KAFKA_URL
+              value: ${MINIKUBE_IP}:30001
+          image: trinitt_cluster
+          imagePullPolicy: Never
+          name: clustering
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8000
+      serviceAccountName: ""
+status: {}

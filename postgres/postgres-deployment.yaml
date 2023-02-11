@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    component: postgres
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: postgres
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        component: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: trinitt_db
+            - name: POSTGRES_USER
+              value: trinitt_users
+            - name: POSTGRES_PASSWORD
+              value: password
+          volumeMounts:
+            - mountPath: "/data/postgres"
+              name: "trinit-pgdata"
+      volumes:
+        - hostPath:
+            path: "/home/docker/pgdata"
+          name: trinit-pgdata
